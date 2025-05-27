@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="CustomButtonStyle" parent="Widget.Material3.Button"> <!-- 继承自 Material3 样式 -->
-        <item name="android:background">@drawable/rad2</item> <!-- 使用自定义背景 -->
-        <item name="android:textColor">#FFFFFF</item> <!-- 设置文本颜色 -->
-        <item name="android:padding">16dp</item> <!-- 设置内边距 -->
-        <item name="android:layout_margin">8dp</item> <!-- 设置外边距 -->
-    </style>
-</resources>
