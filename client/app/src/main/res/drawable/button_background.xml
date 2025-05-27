@@ -1,0 +1,11 @@
+<!-- res/drawable/button_background.xml -->
+<!-- res/drawable/round_button_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval"> <!-- 设置为圆形 -->
+
+    <solid android:color="#D3D3D3" /> <!-- 中心颜色为浅灰色 -->
+
+    <stroke
+        android:width="2dp"
+    android:color="#FFFFFF" />
+</shape>

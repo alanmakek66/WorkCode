@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:orientation="horizontal"
+    android:gravity="end"> <!-- 设置内容对齐到右边 -->
+
+    <!-- 可以设置右边距以增加间距 -->
+
+    <Button
+        android:id="@+id/clearlist2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/bin_logo"
+        android:drawablePadding="0dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:visibility="gone"
+        android:focusable="false"
+        android:clickable="false"/>
+
+    <TextView
+        android:id="@+id/messageBubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:background="@drawable/bubble_background2"
+        android:padding="5dp"
+        android:text="11111111111111111"
+        android:layout_marginStart="45dp"
+        android:textColor="#003D58"
+        android:textSize="30sp" />
+
+    <ImageView
+        android:id="@+id/you"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/staff3" />
+</LinearLayout>

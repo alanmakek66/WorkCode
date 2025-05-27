@@ -1,0 +1,320 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#003D58"
+    tools:context=".MainActivity">
+
+
+
+
+
+
+    <LinearLayout
+        android:id="@+id/receive"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="50000dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginTop="470dp"
+        android:background="@drawable/rad_yellow"
+        android:gravity="center"
+        android:padding="30dp"
+        android:orientation="horizontal">
+
+
+
+        <TextView
+            android:id="@+id/textreceive"
+            android:layout_width="match_parent"
+            android:layout_height="92dp"
+            android:text=""
+            android:lineSpacingExtra="-15dp"
+            android:textSize="1sp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/demo1"
+        android:layout_width="match_parent"
+        android:layout_height="1000dp"
+        android:layout_marginStart="-10dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/rad_black"
+        android:gravity="center"
+        android:padding="30dp"
+        android:orientation="horizontal">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="850dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="-10dp"
+            android:layout_marginTop="-25dp"
+
+            />
+
+
+    </LinearLayout>
+
+
+
+
+
+    <TextView
+        android:id="@+id/textViewResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Recognition"
+        android:textSize="10sp"
+        tools:ignore="SmallSp" />
+
+    <LinearLayout
+        android:id="@+id/resultContainer"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_below="@id/textViewResult"
+        android:layout_marginStart="5000dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="-5dp"
+        android:background="@drawable/rad"
+        android:gravity="center"
+        android:padding="30dp">
+
+        <TextView
+            android:id="@+id/textViewResult2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:text=""
+            android:textSize="1sp" />
+    </LinearLayout>
+
+
+
+    <TextView
+        android:id="@+id/transalteResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginStart="200dp"
+        android:text="Translate result"
+        android:textSize="8sp" />
+
+    <LinearLayout
+        android:id="@+id/boxArea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        android:background="@drawable/rad"
+        android:padding="10dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="left">
+
+            <TextView
+                android:id="@+id/headerTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="v 1.8"
+                android:textSize="10sp"
+                android:textColor="#D3D3D3"
+                android:layout_marginBottom="8dp" />
+        </LinearLayout>
+
+
+
+        <!-- 第一行：四个按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="-10dp"
+            android:gravity="center">
+
+
+
+
+
+            <Button
+                android:id="@+id/btn_ja"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="日語"
+                android:layout_marginEnd="4dp"
+                android:textColor="#003D58"
+                android:textSize="32sp" />
+
+            <Button
+                android:id="@+id/btn_ko"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="韓語"
+                android:layout_marginEnd="4dp"
+                android:textColor="#003D58"
+                android:textSize="32sp" />
+            <Button
+                android:id="@+id/btn_en"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="菲律賓語"
+                android:layout_marginEnd="4dp"
+                android:textColor="#003D58"
+                android:textSize="32sp" />
+
+            <Spinner
+                android:id="@+id/languagebox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rad_yellow"
+                android:layout_weight="1"
+                android:textColor="#003D58"
+                android:textSize="32sp"
+                android:gravity="center"
+
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="120dp">
+
+
+
+            <Button
+                android:id="@+id/clearlast"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/bin_logo"
+                android:text="Last Message"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:drawablePadding="4dp"
+                android:textSize="32sp"
+                android:gravity="center_vertical|left"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="8dp"/>
+
+
+
+            <ImageView
+                android:id="@+id/miclog"
+                android:layout_width="98dp"
+                android:layout_height="110dp"
+                android:text="OFF"
+                android:textSize="18sp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <Button
+                android:id="@+id/clearlist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="4dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:textSize="26sp"
+                android:textColor="@color/white"
+                android:text="Tap to start conversation"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="8dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 第二行：两个 TextView -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/bubbleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/button_bubble"
+                android:padding="10dp"
+                android:text="請問有什麼可以幫到你"
+                android:textColor="#003D58"
+                android:textSize="26sp"
+                android:layout_marginEnd="4dp"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/bubbleTextView2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/button_bubble"
+                android:padding="10dp"
+                android:text="不用客氣請問還需要幫忙嗎"
+                android:textColor="#003D58"
+                android:textSize="26sp"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+
+            android:gravity="center">
+
+            <!-- 第三行：一个 TextView -->
+            <TextView
+                android:id="@+id/bubbleTextView3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/button_bubble"
+                android:padding="10dp"
+                android:text="廁所"
+                android:textColor="#003D58"
+                android:textSize="26sp"
+                android:gravity="center"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="1dp"/>
+
+            <Spinner
+                android:id="@+id/spinnerQandA"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_bubble"
+                android:gravity="center"
+                android:spinnerMode="dropdown"
+                android:textColor="#003D58"
+                android:textSize="26sp" />
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

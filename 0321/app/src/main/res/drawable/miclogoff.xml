@@ -1,0 +1,24 @@
+<!-- drawable/microphone_with_circle.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- 圆形背景 -->
+    <path
+        android:fillColor="#BFBFBF"
+        android:pathData="M12,12m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0" />
+
+    <!-- 麦克风主体 (保持原有颜色和形状) -->
+    <path
+        android:fillColor="#223f9c"
+        android:pathData="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" />
+
+    <!-- 斜线 -->
+    <path
+        android:strokeColor="#223f9c"
+        android:strokeWidth="1"
+        android:pathData="M4,4 L20,20" />
+
+</vector>
