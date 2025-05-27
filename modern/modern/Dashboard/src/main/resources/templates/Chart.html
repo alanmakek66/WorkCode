@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart</title>
+    <script src='/modern/Dashboard/src/main/resources/static/ploy.js'></script>
+    <style>
+        #myDiv {
+            width: 800px;  /* 設置寬度 */
+            height: 600px; /* 設置高度 */
+        }
+    </style>
+</head>
+<body>
+    <div id='myDiv'><!-- Plotly chart will be drawn inside this DIV -->
+        <script>
+            trace1 = {
+                type: 'scatter',
+                x: [1, 2, 3, 4],
+                y: [10, 15, 13, 17],
+                mode: 'lines',
+                name: 'Red',
+                line: {
+                    color: 'rgb(219, 64, 82)',
+                    width: 3
+                }
+            };
+
+            trace2 = {
+                type: 'scatter',
+                x: [1, 2, 3, 4],
+                y: [12, 9, 15, 12],
+                mode: 'lines',
+                name: 'Blue',
+                line: {
+                    color: 'rgb(55, 128, 191)',
+                    width: 1
+                }
+            };
+
+            var layout = {
+                // 可以省略 width 和 height，使用 CSS 控制
+            };
+
+            var data = [trace1, trace2];
+
+            Plotly.newPlot('myDiv', data, layout);
+        </script>
+    </div>
+</body>
+</html>

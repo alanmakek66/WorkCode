@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .sidebar {
+            width: 150px;
+            background-color: #2c3e50;
+            color: white;
+            height: 100vh;
+            padding: 20px;
+        }
+        .sidebar h2 {
+            margin-top: 0;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #34495e;
+        }
+        .content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: #333;
+        }
+        .large {
+            grid-column: span 2; /* 占据2列 */
+            grid-row: span 2; /* 占据2行 */
+        }
+        .medium {
+            grid-column: span 2; /* 占据2列 */
+        }
+        .small {
+            grid-column: span 1; /* 占据1列 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Dashboard</h2>
+        <a href="#">首頁</a>
+        <a href="#">司機</a>
+        <a href="#">報告</a>
+        <a href="http://192.168.10.30:8005/data2" target="_blank">JsonData</a>
+    </div>
+
+    <div class="content">
+        <div class="card large">圖表 1</div>
+        <div class="card medium">圖表 2</div>
+        <div class="card">圖表 3</div>
+        <div class="card">圖表 4</div>
+        <div class="card medium">圖表 5</div>
+        <div class="card">圖表 6</div>
+        <div class="card small">圖表 7</div>
+        
+    </div>
+
+</body>
+</html>

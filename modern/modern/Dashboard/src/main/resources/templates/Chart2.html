@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee+Inline&family=Playwrite+PL:wght@100..400&display=swap" rel="stylesheet">
+  <title>Candlestick Chart</title>
+  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <style>
+    .custom-box {
+      border: 1px solid black;
+      padding: 10px;
+      border-radius: 5px;
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 20px;
+    }
+    .centered-text {
+      text-align: center;
+    }
+    .bungee-inline-regular {
+      font-family: 'Bungee Inline', cursive;
+      font-weight: 400;
+    }
+    .color {
+      color: blue;
+    }
+    .container {
+      display: block;
+    }
+    .ask-bid-container {
+      display: flex;
+      justify-content: space-between;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+      width: 400px;
+      height: 80px;
+    }
+    .ask,
+    .bid {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .ask-bid-container h2 {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      color: #3b34a1;
+    }
+    .ask-bid-container .price {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .ask-bid-container .label {
+      font-size: 14px;
+      color: #100707;
+    }
+    .ask {
+      background-color: #ADD8E6; /* 藍色背景 */
+      border-radius: 5px 0 0 5px;
+    }
+    .bid {
+      background-color: #FF6347; /* 紅色背景 */
+      border-radius: 0 5px 5px 0;
+    }
+    .custom-box p {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .color {
+      color: brown;
+    }
+    a:active {
+      color: blue;
+    }
+    a {
+      color: blue;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="display: inline-block;">
+    <div id="chart-container" style="width: 800px; height: 400px;"></div>
+  </div>
+
+  <div class="custom-box">
+    <p class="centered-text bungee-inline-regular color">Setting</p>
+    <a class="bungee-inline-regular container">Back to Stock Page</a><br>
+    <a class="bungee-inline-regular container">5 mins Chart Current Day</a><br>
+    <a class="bungee-inline-regular container">Candle Stick Chart 1 Day</a><br>
+    <a class="bungee-inline-regular container">Candle Stick Chart Weekly</a><br>
+  </div>
+
+  <script>
+    // 硬編碼的數據示例
+    const data = [
+      { timestamp: 1617244800, open: 100, high: 110, low: 90, close: 105, volume: 1000 },
+      { timestamp: 1617331200, open: 105, high: 115, low: 95, close: 110, volume: 1500 },
+      { timestamp: 1617417600, open: 110, high: 120, low: 100, close: 115, volume: 1200 },
+      { timestamp: 1617504000, open: 115, high: 125, low: 105, close: 120, volume: 1300 },
+      { timestamp: 1617590400, open: 120, high: 130, low: 110, close: 125, volume: 1400 }
+    ];
+
+    const candleData = data.map(item => [
+      new Date(item.timestamp * 1000).getTime(), // 將 timestamp 轉換為毫秒數
+      item.open,
+      item.high,
+      item.low,
+      item.close
+    ]);
+
+    const volumeData = data.map(item => [
+      new Date(item.timestamp * 1000).getTime(), // 將 timestamp 轉換為毫秒數
+      item.volume
+    ]);
+
+    Highcharts.stockChart('chart-container', {
+      chart: {
+        type: 'candlestick',
+        zoomType: 'x'
+      },
+      title: {
+        text: 'Stock Price Candlestick Chart (0388.HK)'
+      },
+      xAxis: {
+        type: 'datetime'
+      },
+      yAxis: [
+        {
+          title: {
+            text: 'Stock Price'
+          },
+          height: '60%',
+          lineWidth: 2
+        },
+        {
+          title: {
+            text: 'Volume'
+          },
+          top: '65%',
+          height: '35%',
+          offset: 0,
+          lineWidth: 2
+        }
+      ],
+      series: [
+        {
+          name: 'Stock Price',
+          data: candleData,
+          dataGrouping: {
+            units: [
+              ['day', [1]],
+              ['month', [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12]]
+            ]
+          }
+        },
+        {
+          name: 'Volume',
+          type: 'column',
+          data: volumeData,
+          yAxis: 1,
+          dataGrouping: {
+            units: [
+              ['day', [1]],
+              ['month', [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12]]
+            ]
+          }
+        }
+      ]
+    });
+  </script>
+</body>
+</html>

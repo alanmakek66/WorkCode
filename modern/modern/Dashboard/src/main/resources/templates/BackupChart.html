@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee+Inline&family=Playwrite+PL:wght@100..400&display=swap" rel="stylesheet">
+  <title>Dynamic 5-Minute Stock Price Chart</title>
+
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/stock.js"></script>
+  <script src="https://code.highcharts.com/modules/series-label.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/export-data.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+  <style>
+    .bungee-inline-regular {
+      font-family: "Bungee Inline", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+    }
+    .ask-bid-container {
+      display: flex;
+      justify-content: space-between;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+      width: 400px;
+      height: 80px;
+    }
+    .ask,
+    .bid {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .ask-bid-container h2 {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      color: #3b34a1;
+    }
+    .ask-bid-container .price {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .ask-bid-container .label {
+      font-size: 14px;
+      color: #100707;
+    }
+    .ask {
+      background-color: #ADD8E6; /* 藍色背景 */
+      border-radius: 5px 0 0 5px;
+    }
+    .bid {
+      background-color: #FF6347; /* 紅色背景 */
+      border-radius: 0 5px 5px 0;
+    }
+    .custom-box p {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .color {
+      color: brown;
+    }
+    .centered-text {
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+    }
+    a:active {
+      color: blue;
+    }
+    a {
+      color: blue;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dynamic 5-Minute Stock Price Chart (0700.HK)</h1>
+  <div style="display: flex; justify-content: space-between;">
+    <div id="stockChart" style="width: 750px; height: 550px;"></div>
+    <div style="display: flex; flex-direction: column;">
+      <div class="ask-bid-container">
+        <div class="ask">
+          <h2>Ask</h2>
+          <div class="price-container">
+            <span id="ask-price" class="price">Loading</span>
+            <span class="label">HKD</span>
+          </div>
+        </div>
+        <div class="bid">
+          <h2>Bid</h2>
+          <div class="price-container">
+            <span id="bid-price" class="price">Loading</span>
+            <span class="label">HKD</span>
+          </div>
+        </div>
+      </div>
+      <div class="custom-box" style="border: 1px solid black; padding: 10px; border-radius: 5px;">
+        <p class="centered-text bungee-inline-regular color">Setting</p>
+        <a th:href="@{/stockpage}" class="bungee-inline-regular container">Back to Stock Page</a><br>
+        <a th:href="@{/700/5min}" class="bungee-inline-regular container">5 mins Chart Current Day</a><br>
+        <a th:href="@{/candle/700/1day}" class="bungee-inline-regular container">Candle Stick Chart 1 Day</a><br>
+        <a th:href="@{/candle/700/weekly}" class="bungee-inline-regular container">Candle Stick Chart Weekly</a><br>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    const chartData = [];
+    const chart = Highcharts.stockChart('stockChart', {
+      rangeSelector: {
+        selected: 1
+      },
+      title: {
+        text: 'Dynamic 5-Minute Stock Price'
+      },
+      time: {
+        timezone: 'Asia/Hong_Kong'
+      },
+      series: [
+        {
+          name: 'Price',
+          data: chartData,
+          tooltip: {
+            valueDecimals: 2
+          }
+        }
+      ]
+    });
+
+    function fetchData() {
+      fetch('http://192.168.10.1:8005/demo')
+        .then(response => response.json())
+        .then(data => {
+          // 假設獲取的數據格式為 { timestamp: 1617244800000, price: 120 }
+          const newData = data.map(item => [item.timestamp, item.price]);
+
+          // 更新圖表數據，並移除舊數據以保持最大數量
+          newData.forEach(point => {
+            chart.addPoint(point, true, false); // true: 更新 x 軸, false: 不更新 y 軸
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+
+    // 每 5 秒更新數據
+    setInterval(fetchData, 5000);
+
+    // 假設你有一個 API 可以獲取最新的 ASK 和 BID 價格
+    function updateASKBIDPrices() {
+      fetch('/askbid/700')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('ask-price').textContent = data.ask.toFixed(2);
+          document.getElementById('bid-price').textContent = data.bid.toFixed(2);
+        })
+        .catch(error => {
+          console.error('Error fetching ASK/BID prices:', error);
+        });
+    }
+
+    // 每隔 5 秒更新一次價格
+    setInterval(updateASKBIDPrices, 5000);
+  </script>
+</body>
+</html>

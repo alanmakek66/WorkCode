@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truck Power</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        #chart-container {
+            max-width: 600px;
+            margin: auto;
+        }
+    </style>
+    <script src="/forLineChart.js"></script>
+</head>
+<body>
+    <h1>Truck Power</h1>
+    <label for="data-select">Choose Truck Data:</label>
+    <select id="data-select">
+        <option value="demo1">Demo 1</option>
+        <option value="demo2">Demo 2</option>
+        <option value="demo3">Demo 3</option>
+    </select>
+    <input type="submit" value="Submit" onclick="updateChart()">
+
+    <div id="chart-container">
+        <div id="chart"></div>
+    </div>
+
+    <script>
+        // 存储数据集
+        const dataSets = {};
+
+        // 从服务器加载数据
+        function loadData() {
+            const urls = {
+                demo1: 'http://localhost:8200/demo1',
+                demo2: 'http://localhost:8200/demo2',
+                demo3: 'http://localhost:8200/demo3'
+            };
+
+            // 使用 Promise.all 加载所有数据
+            return Promise.all(Object.keys(urls).map(key => 
+                fetch(urls[key]).then(response => response.json()).then(data => {
+                    dataSets[key] = data; // 将数据存储到 dataSets 中
+                })
+            ));
+        }
+
+        // 初始化图表
+        function initChart(data) {
+            Highcharts.chart('chart', {
+                chart: {
+                    type: 'line'
+                },
+                title: {
+                    text: '数据展示'
+                },
+                xAxis: {
+                    categories: data.categories
+                },
+                yAxis: {
+                    title: {
+                        text: 'Power'
+                    }
+                },
+                series: [{
+                    name: 'Demo 数据',
+                    data: data.values
+                }]
+            });
+        }
+
+        // 更新图表
+        function updateChart() {
+            const selectedData = document.getElementById('data-select').value;
+            initChart(dataSets[selectedData]);
+        }
+
+        // 页面加载时
+        window.onload = function() {
+            loadData().then(() => {
+                initChart(dataSets.demo1); // 默认显示 demo1 的数据
+            });
+        };
+    </script>
+</body>
+</html>

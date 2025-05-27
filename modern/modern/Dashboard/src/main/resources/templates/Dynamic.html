@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Highcharts Example</title>
+    <script>
+        const customConsole = (w) => {
+            const pushToConsole = (payload, type) => {
+                w.parent.postMessage({
+                    console: {
+                        payload: stringify(payload),
+                        type: type
+                    }
+                }, "*")
+            }
+
+            w.onerror = (message, url, line, column) => {
+                line = line - 70
+                if (line < 0) {
+                    pushToConsole(message, "error")
+                } else {
+                    pushToConsole(`[${line}:${column}] ${message}`, "error")
+                }
+            }
+
+            let console = (function(systemConsole) {
+                return {
+                    log: function() {
+                        let args = Array.from(arguments)
+                        pushToConsole(args, "log")
+                        systemConsole.log.apply(this, args)
+                    },
+                    info: function() {
+                        let args = Array.from(arguments)
+                        pushToConsole(args, "info")
+                        systemConsole.info.apply(this, args)
+                    },
+                    warn: function() {
+                        let args = Array.from(arguments)
+                        pushToConsole(args, "warn")
+                        systemConsole.warn.apply(this, args)
+                    },
+                    error: function() {
+                        let args = Array.from(arguments)
+                        pushToConsole(args, "error")
+                        systemConsole.error.apply(this, args)
+                    },
+                    system: function(arg) {
+                        pushToConsole(arg, "system")
+                    },
+                    clear: function() {
+                        systemConsole.clear.apply(this, {})
+                    },
+                    time: function() {
+                        let args = Array.from(arguments)
+                        systemConsole.time.apply(this, args)
+                    },
+                    assert: function(assertion, label) {
+                        if (!assertion) {
+                            pushToConsole(label, "log")
+                        }
+
+                        let args = Array.from(arguments)
+                        systemConsole.assert.apply(this, args)
+                    }
+                }
+            }(window.console))
+
+            window.console = { ...window.console, ...console }
+
+            console.system("Running fiddle")
+        }
+
+        if (window.parent) {
+            customConsole(window)
+        }
+    </script>
+
+    <style>
+        .highcharts-figure,
+        .highcharts-data-table table {
+            min-width: 360px;
+            max-width: 800px;
+            margin: 1em auto;
+        }
+
+        .highcharts-data-table table {
+            font-family: Verdana, sans-serif;
+            border-collapse: collapse;
+            border: 1px solid #ebebeb;
+            margin: 10px auto;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .highcharts-data-table caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .highcharts-data-table th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+
+        .highcharts-data-table td,
+        .highcharts-data-table th,
+        .highcharts-data-table caption {
+            padding: 0.5em;
+        }
+
+        .highcharts-data-table thead tr,
+        .highcharts-data-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .highcharts-data-table tr:hover {
+            background: #f1f7ff;
+        }
+
+        .ld-form {
+            max-width: 800px;
+            box-sizing: border-box;
+            margin: 0 auto;
+            padding: 1em 10px;
+        }
+
+        .ld-row {
+            margin: 0.3em 0;
+        }
+
+        .ld-row input {
+            line-height: 1.5em;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid rgba(238, 20, 20, 0.3);
+            border-radius: 0.25rem;
+            color: #495057;
+        }
+
+        .ld-label {
+            width: 200px;
+            display: inline-block;
+        }
+
+        .ld-url-input {
+            width: 400px;
+            max-width: calc(100% - 2rem);
+        }
+
+        .ld-time-input {
+            width: 40px;
+        }
+
+        .highcharts-description {
+            margin: 0.3rem 10px;
+        }
+    </style>
+</head>
+<body>
+    <script src="/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <figure class="highcharts-figure">
+        <div id="container"></div>
+        <p class="highcharts-description">
+            Datasets formatted in CSV or JSON can be fetched remotely using the
+            <code>data</code> module. This chart shows how a chart can also be
+            configured to poll against the remote source.
+        </p>
+    </figure>
+    
+    <div class="ld-form">
+        <div class="ld-row">
+            <label class="ld-label">
+                Enable Polling
+            </label>
+            <input type="checkbox" checked="checked" id="enablePolling"/>
+        </div>
+        <div class="ld-row">
+            <label class="ld-label">
+                Polling Time (Seconds)
+            </label>
+            <input class="ld-time-input" type="number" value="2" id="pollingTime"/>
+        </div>
+        <div class="ld-row">
+            <label class="ld-label">
+                CSV URL
+            </label>
+            <input class="ld-url-input" type="text" id="fetchURL"/>
+        </div>
+    </div>
+
+    <script>
+        const defaultData = "http://localhost:8111/data"; // 更改为本地 URL
+        const urlInput = document.getElementById("fetchURL");
+        const pollingCheckbox = document.getElementById("enablePolling");
+        const pollingInput = document.getElementById("pollingTime");
+
+        function createChart() {
+            Highcharts.chart("container", {
+                chart: {
+                    type: "areaspline",
+                },
+                lang: {
+                    locale: "en-GB",
+                },
+                title: {
+                    text: "Live Data",
+                },
+                accessibility: {
+                    announceNewData: {
+                        enabled: true,
+                        minAnnounceInterval: 15000,
+                        announcementFormatter: function (allSeries, newSeries, newPoint) {
+                            if (newPoint) {
+                                return "New point added. Value: " + newPoint.y;
+                            }
+                            return false;
+                        },
+                    },
+                },
+                xAxis: {
+                    type: 'datetime', // 时间类型
+                    tickInterval: 8000, // 每 8 秒显示一个刻度
+                    dateTimeLabelFormats: {
+                        second: '%H:%M:%S', // 秒的格式
+                    },
+                    labels: {
+                        formatter: function() {
+                            // 将 UTC 时间转换为香港时间（UTC+8）
+                            const date = new Date(this.value);
+                            const hkTime = new Date(date.getTime() + 0 * 60 * 60 * 1000); // UTC+8
+                            return Highcharts.dateFormat('%H:%M:%S', hkTime.getTime());
+                        }
+                    }
+                },
+                plotOptions: {
+                    areaspline: {
+                        color: "#32CD32",
+                        fillColor: {
+                            linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+                            stops: [
+                                [0, "#32CD32"],
+                                [1, "#32CD3200"],
+                            ],
+                        },
+                        threshold: null,
+                        marker: {
+                            lineWidth: 1,
+                            lineColor: null,
+                            fillColor: "white",
+                        },
+                    },
+                },
+                data: {
+                    csvURL: urlInput.value,
+                    enablePolling: pollingCheckbox.checked === true,
+                    dataRefreshRate: parseInt(pollingInput.value, 10),
+                },
+            });
+
+            if (pollingInput.value < 1 || !pollingInput.value) {
+                pollingInput.value = 1;
+            }
+        }
+
+        urlInput.value = defaultData;
+
+        pollingCheckbox.onchange =
+        urlInput.onchange =
+        pollingInput.onchange =
+        createChart;
+
+        // Create the chart
+        createChart();
+    </script>
+</body>
+</html>

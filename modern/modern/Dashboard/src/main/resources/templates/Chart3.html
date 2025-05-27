@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee+Inline&family=Playwrite+PL:wght@100..400&display=swap" rel="stylesheet">
+  <title>5-Minute Stock Price Chart</title>
+
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/stock.js"></script>
+  <script src="https://code.highcharts.com/modules/series-label.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/export-data.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+  <style>
+    .bungee-inline-regular {
+      font-family: "Bungee Inline", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+    }
+    .ask-bid-container {
+      display: flex;
+      justify-content: space-between;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+      width: 400px;
+      height: 80px;
+    }
+    .ask,
+    .bid {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .ask-bid-container h2 {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      color: #3b34a1;
+    }
+    .ask-bid-container .price {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .ask-bid-container .label {
+      font-size: 14px;
+      color: #100707;
+    }
+    .ask {
+      background-color: #ADD8E6; /* 藍色背景 */
+      border-radius: 5px 0 0 5px;
+    }
+    .bid {
+      background-color: #FF6347; /* 紅色背景 */
+      border-radius: 0 5px 5px 0;
+    }
+    .custom-box p {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .color {
+      color: brown;
+    }
+    .centered-text {
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+    }
+    a:active {
+      color: blue;
+    }
+    a {
+      color: blue;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Demo Line Chart</h1>
+  <div style="display: flex; justify-content: space-between;">
+    <div id="stockChart" style="width: 2000px; height: 550px;"></div>
+    
+      
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    // 硬編碼的數據示例
+    const data = [
+      { timestamp: 1617244800000, price: 120 },
+      { timestamp: 1617244860000, price: 121 },
+      { timestamp: 1617244920000, price: 122 },
+      { timestamp: 1617244980000, price: 119 },
+      { timestamp: 1617245040000, price: 123 },
+      { timestamp: 1617245100000, price: 124 },
+      { timestamp: 1617245160000, price: 125 },
+      { timestamp: 1617245220000, price: 126 },
+      { timestamp: 1617245280000, price: 127 },
+      { timestamp: 1617245340000, price: 128 }
+    ];
+
+    const processedData = data.map(item => [item.timestamp, item.price]);
+
+    // 計算5個 Moving Average
+    const calculateMovingAverage = (data, windowSize) => {
+      const result = [];
+      for (let i = 0; i < data.length; i++) {
+        const start = Math.max(0, i - windowSize + 1);
+        const window = data.slice(start, i + 1);
+        const average = window.reduce((sum, value) => sum + value[1], 0) / window.length;
+        result.push([data[i][0], average]);
+      }
+      return result;
+    };
+
+    const movingAverage5 = calculateMovingAverage(processedData, 5);
+
+    Highcharts.stockChart('stockChart', {
+      rangeSelector: {
+        selected: 1
+      },
+      title: {
+        text: '5-Minute Stock Price'
+      },
+      time: {
+        timezone: 'Asia/Hong_Kong'
+      },
+      series: [
+        {
+          name: 'Price',
+          data: processedData,
+          tooltip: {
+            valueDecimals: 2
+          }
+        },
+        {
+          name: 'MA',
+          data: movingAverage5,
+          type: 'spline', // 指定使用 'spline' 類型的圖表
+          tooltip: {
+            valueDecimals: 2
+          }
+        }
+      ]
+    });
+
+    // 假設你有一個 API 可以獲取最新的 ASK 和 BID 價格
+    function updateASKBIDPrices() {
+      fetch('/askbid/700')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('ask-price').textContent = data.ask.toFixed(2);
+          document.getElementById('bid-price').textContent = data.bid.toFixed(2);
+        })
+        .catch(error => {
+          console.error('Error fetching ASK/BID prices:', error);
+        });
+    }
+
+    // 每隔 5 秒更新一次價格
+    setInterval(updateASKBIDPrices, 5000);
+  </script>
+</body>
+</html>

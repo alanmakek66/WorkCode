@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <title>Truck Power</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        #chart-container {
+            max-width: 600px;
+            margin: auto;
+        }
+        canvas {
+            width: 100% !important;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <h1>Truck Power</h1>
+    <label for="data-select">Choose Truck Data:</label>
+    <select id="data-select">
+        <option value="demo1">Demo 1</option>
+        <option value="demo2">Demo 2</option>
+        <option value="demo3">Demo 3</option>
+    </select>
+    <input type="submit" value="Submit" onclick="updateChart()">
+
+    <div id="chart-container">
+        <canvas id="myChart2"></canvas>
+    </div>
+
+    <script>
+        const dataUrls = {
+            demo1: 'http://localhost:8200/demo1',
+            demo2: 'http://localhost:8200/demo2',
+            demo3: 'http://localhost:8200/demo3'
+        };
+
+        // 初始化图表
+        let myChart2;
+
+        function initChart(data) {
+            const xValues = data.categories;
+            const chartData = data.values;
+
+            // 创建图表
+            if (myChart2) {
+                myChart2.destroy(); // 销毁旧图表实例
+            }
+
+            myChart2 = new Chart("myChart2", {
+                type: "line",
+                data: {
+                    labels: xValues,
+                    datasets: [{ 
+                        data: chartData,
+                        borderColor: "red",
+                        fill: false
+                    }]
+                },
+                options: {
+                    legend: { display: false }
+                }
+            });
+        }
+
+        // 更新图表
+        function updateChart() {
+            const selectedData = document.getElementById('data-select').value;
+            fetch(dataUrls[selectedData])
+                .then(response => response.json())
+                .then(data => {
+                    initChart(data); // 更新图表数据
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // 页面加载时使用 demo1 的数据
+        window.onload = function() {
+            updateChart(); // 默认加载 demo1 数据
+        };
+    </script>
+</body>
+</html>
