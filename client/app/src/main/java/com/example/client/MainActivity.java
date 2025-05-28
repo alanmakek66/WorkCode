@@ -920,7 +920,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void translateLanguage(String text, String selectedLanguage) {
-        String url = "https://translation.googleapis.com/language/translate/v2?key=" + "AIzaSyCxsExtPVzq7F69diSIgDRoPuiBfP5IoWw";
+        String url = "https://translation.googleapis.com/language/translate/v2?key=" + "";
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("q", text);
