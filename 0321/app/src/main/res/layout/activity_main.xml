@@ -6,11 +6,6 @@
     android:background="#003D58"
     tools:context=".MainActivity">
 
-
-
-
-
-
     <LinearLayout
         android:id="@+id/receive"
         android:layout_width="match_parent"
@@ -126,7 +121,7 @@
                 android:id="@+id/headerTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="v 1.8"
+                android:text="v 2.1"
                 android:textSize="10sp"
                 android:textColor="#D3D3D3"
                 android:layout_marginBottom="8dp" />

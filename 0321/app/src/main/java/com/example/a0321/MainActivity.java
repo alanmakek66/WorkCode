@@ -2,9 +2,11 @@ package com.example.a0321;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.RecognitionListener;
@@ -18,6 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -127,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayAdapter<String> adapter1;
 
-    private static final String FILE_NAME = "demo.txt";
+    private static final String FILE_NAME = "sample.txt";
     private static final int PICK_FILE_REQUEST = 1;
     private static List<String> question = new ArrayList<>();
 
@@ -149,12 +152,24 @@ public class MainActivity extends AppCompatActivity {
     private int countdown = 3;
     private int resumecounter = 0;
 
+    private Runnable runnable;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initializeFile();
+        String numberforreset=readFile();
+        Log.e("MainActivity", "number : " + numberforreset);
+
+        if(!("0".equals(numberforreset))&&!(numberforreset==null)&&Integer.valueOf(numberforreset)%2!=0){
+
+            System.exit(0);
+        }
+
+        Log.e("MainActivity", "number : " + numberforreset);
 
 
         latch = new CountDownLatch(1);
@@ -402,6 +417,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                int batteryLevel = getBatteryPercentage();
+                String batteryLevelfordb = String.valueOf(batteryLevel);
+                sendTobatteryDB(batteryLevelfordb);
+                Log.e("MainActivity.this","battery"+batteryLevelfordb);
+                Toast.makeText(MainActivity.this,"battery "+batteryLevel,Toast.LENGTH_SHORT).show();
+                handler.postDelayed(this, 200000); //
+            }
+        };
+
+        // 啟動任務
+        handler.post(runnable);
+
         spinnerlanguage();
 
 
@@ -423,20 +453,12 @@ public class MainActivity extends AppCompatActivity {
 
         clearalllist.setBackgroundColor(Color.parseColor("#009183"));
 
-
-
-
-
         can1.setOnClickListener(v -> {
             if("1".equals(conversationstatus)){
                 addMessage(fqaModels.get(0).getValue(), "1");
                 translateLanguage(fqaModels.get(0).getValue(),selectedLanguage);
             }
-
-
-
         });
-
         can2.setOnClickListener(v -> {
             if("1".equals(conversationstatus)){
                 addMessage(fqaModels.get(1).getValue(), "1");
@@ -455,20 +477,12 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-
-
-
         btnEnglish.setBackgroundColor(Color.parseColor("#BFBFBF")); // 浅灰色
 
         btnEnglish.setTextColor(Color.WHITE);
-
         btnJapanese.setBackgroundColor(Color.parseColor("#BFBFBF")); // 浅灰色
 
-
         btnKorean.setBackgroundColor(Color.parseColor("#BFBFBF")); // 浅灰色
-
-
-
 
         // 設置初始按鈕背景和文字顏色
         //buttonStart.setBackgroundColor(Color.parseColor("#808080"));
@@ -476,8 +490,6 @@ public class MainActivity extends AppCompatActivity {
 
         textreceive.setTextColor(Color.BLUE);
         textViewResult2.setTextColor(Color.BLUE);
-
-
 
         // 初始化 Volley 的 RequestQueue
         requestQueue = Volley.newRequestQueue(this);
@@ -488,10 +500,6 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.RECORD_AUDIO},
                     REQUEST_RECORD_AUDIO_PERMISSION);
         }
-
-
-
-
         // 檢查並請求錄音權限
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -500,15 +508,8 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_RECORD_AUDIO_PERMISSION);
         }
         new Thread(this::getIP).start();
-
-
-
-
         new Thread(this::startSocket).start();  //startServerForLanguage
         new Thread(this::startServerForLanguage).start();
-
-
-
 
         // 初始化 SpeechRecognizer
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
@@ -795,7 +796,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-            Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
             sendToSocket2("fil");
             sendToDB(getCurrentTime()+" changed to English");
         });
@@ -815,7 +816,7 @@ public class MainActivity extends AppCompatActivity {
             btnKorean.setTextColor(Color.parseColor("#003D58"));
 
             selectedLanguage = "ja-JP";
-            Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
             sendToSocket2("ja");
             sendToDB(getCurrentTime()+" changed to Japanese");
         });
@@ -833,7 +834,7 @@ public class MainActivity extends AppCompatActivity {
             btnJapanese.setTextColor(Color.parseColor("#003D58"));
 
             selectedLanguage = "ko-KR";
-            Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
             sendToSocket2("ko");
             sendToDB(getCurrentTime()+" change to korean");
         });
@@ -1015,7 +1016,7 @@ public class MainActivity extends AppCompatActivity {
                                     clearalllist.performClick();
                                 }
 
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             } else if (message.equals("ja")) {
@@ -1036,7 +1037,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }else if (message.equals("ko")) {
@@ -1055,7 +1056,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1075,7 +1076,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1095,7 +1096,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1114,7 +1115,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1133,7 +1134,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1152,7 +1153,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1170,7 +1171,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1190,7 +1191,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1210,7 +1211,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1230,7 +1231,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1250,7 +1251,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1270,7 +1271,7 @@ public class MainActivity extends AppCompatActivity {
                                 if("0".equals(conversationstatus)){
                                     clearalllist.performClick();
                                 }
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
 
                             }
@@ -1451,6 +1452,17 @@ public class MainActivity extends AppCompatActivity {
     private void sendToDB(String message) {
         new Thread(() -> {
             try (Socket socket = new Socket(InetAddress.getByName("antares.ksstec.com.hk"), 57002);
+                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+                out.println(message);
+                Log.d("Sockettodb", "已發送: " + message);
+            } catch (Exception e) {
+                Log.e("Sockettodb", "發送消息錯誤: ", e);
+            }
+        }).start();
+    }
+    private void sendTobatteryDB(String message) {
+        new Thread(() -> {
+            try (Socket socket = new Socket(InetAddress.getByName("antares.ksstec.com.hk"), 57004);
                  PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
                 out.println(message);
                 Log.d("Sockettodb", "已發送: " + message);
@@ -1731,17 +1743,19 @@ public class MainActivity extends AppCompatActivity {
 
         handler.post(countdownRunnable);
     }
+    private int getBatteryPercentage() {
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = registerReceiver(null, intentFilter);
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        return (int) ((level / (float) scale) * 100); // 計算百分比
+    }
 
     @Override
     public void onResume(){
         super.onResume();
-        if(resumecounter>0){
-            question.clear();
-        }
-        resumecounter++;
-        Log.e("MainActivity", "straff  Resume client 的ip 是" + SERVER_IP );
-        Log.e("MainActivity", "resumecounter" + resumecounter );
-        Toast.makeText(MainActivity.this, "trigger resume resumecounter : "+resumecounter, Toast.LENGTH_SHORT).show();
+
+
         // put your code here...
 
     }
@@ -1752,6 +1766,48 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (speechRecognizer != null) {
             speechRecognizer.destroy();
+        }
+    }
+    private String readFile() {
+        try (FileInputStream fis = openFileInput(FILE_NAME)) {
+            byte[] data = new byte[fis.available()];
+            fis.read(data);
+            String text = new String(data);
+
+            return  text;
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }return  null;
+    }
+
+    private void initializeFile() {
+        File file = new File(getFilesDir(), FILE_NAME); // 獲取文件路徑
+
+        if (!file.exists()) {
+            //
+            try (FileOutputStream fos = openFileOutput(FILE_NAME, MODE_PRIVATE)) {
+                fos.write("0".getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // 文件存在，讀取當前數字並加 1
+            try (FileInputStream fis = openFileInput(FILE_NAME)) {
+                byte[] data = new byte[fis.available()];
+                fis.read(data);
+                String text = new String(data);
+                int number = Integer.parseInt(text) + 1; // 將數字加一
+
+                // 覆蓋文件內容
+                try (FileOutputStream fos = openFileOutput(FILE_NAME, MODE_PRIVATE)) {
+                    fos.write(String.valueOf(number).getBytes()); // 寫入新的數字
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

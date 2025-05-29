@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -146,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
     private  ServerSocket serverSocket2;
     private int finishcounter = 0;
 
-    private Button resetbutton;
+    private Runnable runnable;
     private String myidadress;
     private static final String FILE_NAME = "demo.txt";
 
@@ -158,9 +160,9 @@ public class MainActivity extends AppCompatActivity {
         initializeFile();
         String numberforreset=readFile();
         Log.e("MainActivity", "number : " + numberforreset);
-        Toast.makeText(MainActivity.this,"number : "+numberforreset,Toast.LENGTH_SHORT).show();
+        
         if(!("0".equals(numberforreset))&&!(numberforreset==null)&&Integer.valueOf(numberforreset)%2!=0){
-            Toast.makeText(MainActivity.this," killer ",Toast.LENGTH_SHORT).show();
+
             System.exit(0);
         }
 
@@ -176,11 +178,9 @@ public class MainActivity extends AppCompatActivity {
         screensafer = findViewById(R.id.screenSafer);
         micstatus = findViewById(R.id.micstatus);
 
-        resetbutton = findViewById(R.id.resetbutton);
 
-        resetbutton.setOnClickListener(view -> {
-            System.exit(0);
-        });
+
+
 
         kickBoxHelper = new KickBoxHelper(this);
 
@@ -436,8 +436,6 @@ public class MainActivity extends AppCompatActivity {
                     stringVoiceText2 = "";
                     addornot = "1";
                     speechRecognizer.startListening(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH));
-
-
                     isListening = true;
                     micstatus.setText("Mic On");
 
@@ -445,10 +443,11 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 miclogo.setImageResource(imageA_Resource);
                 if (isListening) {
+                    addornot = "0";
                     speechRecognizer.startListening(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH));
 
                     isListening = false;
-                    addornot = "0";
+
                     micstatus.setText("Mic Off");
                 }
             }
@@ -705,6 +704,17 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_RECORD_AUDIO_PERMISSION);
         }
 
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                sendip(myidadress); // 替換為您想要發送的消息
+                handler.postDelayed(this, 10000); //
+                //Toast.makeText(MainActivity.this,"sendip",Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        // 啟動定時任務
+        handler.post(runnable);
 
         new Thread(this::startServerPort9000).start();
         new Thread(this::startServer9005).start();//
@@ -867,7 +877,7 @@ public class MainActivity extends AppCompatActivity {
             btnKorean.setTextColor(Color.parseColor("#003D58"));
             languagebox.setSelection(0);
             abovelanguage = selectedLanguage;
-            Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
             sendToSocket2("fil");
             addMessage("<<Lumipat sa Filipino>>", "1");
             initializeSpeechRecognizer();
@@ -909,7 +919,7 @@ public class MainActivity extends AppCompatActivity {
             languagebox.setSelection(0);
 
             abovelanguage = selectedLanguage;
-            Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
             sendToSocket2("ko");
             addMessage("<<한국어로 전환>>", "1");
             initializeSpeechRecognizer();
@@ -1014,7 +1024,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 Log.e("JSONCreate", "Error creating JSON object: " + e.getMessage());
                 runOnUiThread(() -> {
-                    Toast.makeText(MainActivity.this, "Error creating translation request", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "Error creating translation request", Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();
@@ -1150,7 +1160,7 @@ public class MainActivity extends AppCompatActivity {
                                 addMessage("<<Lumipat sa Filipino>>", "1");
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(0);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
 
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
@@ -1168,7 +1178,7 @@ public class MainActivity extends AppCompatActivity {
                                 btnKorean.setTextColor(Color.parseColor("#003D58"));
                                 languagebox.setSelection(0);
                                 addMessage("<<日本語に切り替える>>", "1");
-                                sendToSocket2("ja-JP");
+                                sendToSocket2("ja");
 
                                 abovelanguage = selectedLanguage;
                                 Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
@@ -1192,7 +1202,7 @@ public class MainActivity extends AppCompatActivity {
                                 sendToSocket2("ko");
 
                                 abovelanguage = selectedLanguage;
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1210,7 +1220,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 languagebox.setSelection(1);
 
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1226,7 +1236,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(3);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1241,7 +1251,7 @@ public class MainActivity extends AppCompatActivity {
                                 btnJapanese.setTextColor(Color.parseColor("#003D58"));
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(2);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1257,7 +1267,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(4);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1272,7 +1282,7 @@ public class MainActivity extends AppCompatActivity {
                                 btnJapanese.setTextColor(Color.parseColor("#003D58"));
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(5);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1287,7 +1297,7 @@ public class MainActivity extends AppCompatActivity {
                                 btnJapanese.setTextColor(Color.parseColor("#003D58"));
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(6);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1304,7 +1314,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(7);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1319,7 +1329,7 @@ public class MainActivity extends AppCompatActivity {
                                 btnJapanese.setTextColor(Color.parseColor("#003D58"));
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(8);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1335,7 +1345,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(9);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1349,7 +1359,7 @@ public class MainActivity extends AppCompatActivity {
                                 btnJapanese.setTextColor(Color.parseColor("#003D58"));
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(10);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1364,7 +1374,7 @@ public class MainActivity extends AppCompatActivity {
                                 btnJapanese.setTextColor(Color.parseColor("#003D58"));
                                 abovelanguage = selectedLanguage;
                                 languagebox.setSelection(11);
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 initializeSpeechRecognizer();
                                 speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -1376,7 +1386,7 @@ public class MainActivity extends AppCompatActivity {
                                     stringVoiceText2 = "";
                                     initializeSpeechRecognizer();
                                     speechRecognizer.startListening(speechRecognizerIntent);
-                                    Toast.makeText(MainActivity.this, "Mic On", Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(MainActivity.this, "Mic On", Toast.LENGTH_SHORT).show();
                                     miclogo.setImageResource(imageB_Resource);
 
 
@@ -1392,7 +1402,7 @@ public class MainActivity extends AppCompatActivity {
                                 stringVoiceText2 = "";
                                 textViewResult2.setText("");
 
-                                speechRecognizer.startListening(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH));
+                                //speechRecognizer.startListening(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH));
                                 clearmessage();
                                 Toast.makeText(MainActivity.this, "Mic Off", Toast.LENGTH_SHORT).show();
                                 miclogo.setImageResource(imageA_Resource);
@@ -1408,7 +1418,7 @@ public class MainActivity extends AppCompatActivity {
                                 btnJapanese.setBackgroundColor(Color.parseColor("#009183"));
                                 languagebox.setSelection(0);
                                 speechRecognizer.destroy();
-                                Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, selectedLanguage, Toast.LENGTH_SHORT).show();
                                 screensafer.setVisibility(View.VISIBLE);
 
 
@@ -1625,6 +1635,13 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Wi-Fi is disconnected..", Toast.LENGTH_SHORT).show();
             return -1;
         }
+    }
+    private int getBatteryPercentage() {
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = registerReceiver(null, intentFilter);
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        return (int) ((level / (float) scale) * 100); // 計算百分比
     }
 
 
